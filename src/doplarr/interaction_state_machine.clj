@@ -111,10 +111,22 @@
                       (do
                         (info "Performing request for " payload)
                         (msg-resp "Request performed!")
-                        (case (:discord/requested-msg-style @state/config)
-                          :none nil
-                          :embed (m/create-message! messaging channel-id (discord/request-performed-embed embed user-id))
-                          (m/create-message! messaging channel-id (discord/request-performed-plain payload media-type user-id)))))))
+                         ; Send DM notification if enabled
+                        (when (:discord/dm-notifications @state/config)
+                          (a/go
+                            (let [dm-channel (->> @(m/create-dm! messaging user-id)
+                                                 (else #(fatal % "Error creating DM channel"))
+                                                 :id)]
+                              (case (:discord/requested-msg-style @state/config)
+                                :none nil
+                                :embed (m/create-message! messaging dm-channel (discord/dm-notification-embed embed))
+                                (m/create-message! messaging dm-channel (discord/dm-notification-plain payload media-type))))))
+                        ; Send channel message if not DM-only
+                        (when (not (:discord/dm-notifications @state/config))
+                          (case (:discord/requested-msg-style @state/config)
+                            :none nil
+                            :embed (m/create-message! messaging channel-id (discord/request-performed-embed embed user-id))
+                            (m/create-message! messaging channel-id (discord/request-performed-plain payload media-type user-id))))))))
             (else (fn [e]
                     (let [{:keys [status body] :as data} (ex-data e)]
                       (if (= status 403)

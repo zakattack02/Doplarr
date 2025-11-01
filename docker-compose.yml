@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  doplarr:
+    image: kiranshila/doplarr:latest
+    container_name: doplarr
+    restart: unless-stopped
+    environment:
+      # Required: Discord Bot Token
+      DISCORD__TOKEN: ${DISCORD__TOKEN}
+      
+      # Choose ONE backend: Overseerr, Radarr, or Sonarr
+      # --- Overseerr Configuration (Recommended) ---
+      OVERSEERR__URL: ${OVERSEERR__URL:-http://overseerr:5055}
+      OVERSEERR__API: ${OVERSEERR__API}
+      OVERSEERR__DEFAULT_ID: ${OVERSEERR__DEFAULT_ID:-1}
+      
+      # --- Radarr Configuration (if not using Overseerr) ---
+      # RADARR__URL: ${RADARR__URL}
+      # RADARR__API: ${RADARR__API}
+      # RADARR__QUALITY_PROFILE: ${RADARR__QUALITY_PROFILE}
+      # RADARR__ROOTFOLDER: ${RADARR__ROOTFOLDER}
+      
+      # --- Sonarr Configuration (if not using Overseerr) ---
+      # SONARR__URL: ${SONARR__URL}
+      # SONARR__API: ${SONARR__API}
+      # SONARR__QUALITY_PROFILE: ${SONARR__QUALITY_PROFILE}
+      # SONARR__LANGUAGE_PROFILE: ${SONARR__LANGUAGE_PROFILE}
+      # SONARR__ROOTFOLDER: ${SONARR__ROOTFOLDER}
+      # SONARR__SEASON_FOLDERS: ${SONARR__SEASON_FOLDERS:-false}
+      
+      # Optional Settings
+      DISCORD__MAX_RESULTS: ${DISCORD__MAX_RESULTS:-25}
+      DISCORD__REQUESTED_MSG_STYLE: ${DISCORD__REQUESTED_MSG_STYLE:-plain}
+      DISCORD__DM_NOTIFICATIONS: ${DISCORD__DM_NOTIFICATIONS:-false}
+      PARTIAL_SEASONS: ${PARTIAL_SEASONS:-true}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+    
+    networks:
+      - doplarr-network
+    
+    # Optional: Uncomment if you want to add logging
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  doplarr-network:
+    driver: bridge

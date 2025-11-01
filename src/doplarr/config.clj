@@ -28,6 +28,7 @@
     :discord/token
     :discord/max-results
     :discord/requested-msg-style
+    :discord/dm-notifications
     ; Doplarr
     :partial-seasons
     :log-level})

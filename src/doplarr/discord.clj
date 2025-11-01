@@ -149,6 +149,16 @@
   {:content (str "<@" user-id "> has requested:")
    :embeds [(request-embed embed-data)]})
 
+(defn dm-notification-plain [payload media-type]
+  {:content
+   (str "Your request for the "
+        (name media-type) " `" (:title payload) " (" (:year payload) ")"
+        "` has been received!")})
+
+(defn dm-notification-embed [embed-data]
+  {:content "Your request has been received:"
+   :embeds [(request-embed embed-data)]})
+
 ;; Discljord Utilities
 (defn register-commands [media-types bot-id messaging guild-id]
   (->> @(m/bulk-overwrite-guild-application-commands!
