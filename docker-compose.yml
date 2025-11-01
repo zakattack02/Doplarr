@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   doplarr:
-    image: kiranshila/doplarr:latest
+    image: kanucks8/doplarr:latest
     container_name: doplarr
     restart: unless-stopped
     environment:
