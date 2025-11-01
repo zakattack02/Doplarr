@@ -20,6 +20,7 @@
 (spec/def :discord/max-results (spec/int-in 1 26))
 (spec/def :discord/requested-msg-style #{:none :plain :embed})
 (spec/def :discord/dm-notifications boolean?)
+(spec/def :webhook/port (spec/int-in 1 65536))
 
 ; Radarr optionals
 (spec/def :radarr/quality-profile string?)
@@ -56,6 +57,7 @@ If you have configured one, make sure to check spelling. A valid configuration c
                                :opt [:discord/max-results
                                      :discord/requested-msg-style
                                      :discord/dm-notifications
+                                     :webhook/port
                                      :radarr/quality-profile
                                      :sonarr/quality-profile
                                      :sonarr/language-profile

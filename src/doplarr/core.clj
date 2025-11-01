@@ -9,6 +9,7 @@
    [doplarr.discord :as discord]
    [doplarr.interaction-state-machine :as ism]
    [doplarr.state :as state]
+   [doplarr.webhook-server :as ws]
    [taoensso.timbre :refer [debug fatal info] :as timbre]
    [taoensso.timbre.tools.logging :as tlog])
   (:gen-class))
@@ -55,15 +56,21 @@
         token (:discord/token @state/config)
         connection-ch (c/connect-bot! token event-ch :intents #{:guilds})
         messaging-ch (m/start-connection! token)
+        webhook-port (:webhook/port @state/config 3000)
+        webhook-server (when (:discord/dm-notifications @state/config)
+                         (ws/start-webhook-server webhook-port))
         init-state {:connection connection-ch
                     :event event-ch
-                    :messaging messaging-ch}]
+                    :messaging messaging-ch
+                    :webhook-server webhook-server}]
     (reset! state/discord init-state)
     (try (e/message-pump! event-ch handle-event!)
          (catch Exception e (fatal e "Exception thrown from event handler"))
          (finally
            (m/stop-connection! messaging-ch)
-           (a/close!           event-ch)))))
+           (when webhook-server
+             (ws/stop-webhook-server webhook-server))
+           (a/close! event-ch)))))
 
 (defn setup-config! []
   (reset! state/config (config/valid-config (load-env)))

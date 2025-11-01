@@ -29,6 +29,8 @@
     :discord/max-results
     :discord/requested-msg-style
     :discord/dm-notifications
+    ; Webhook
+    :webhook/port
     ; Doplarr
     :partial-seasons
     :log-level})
