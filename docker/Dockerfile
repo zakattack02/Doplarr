@@ -3,13 +3,14 @@ FROM clojure:tools-deps-1.11.1.1435 as builder
 WORKDIR /src
 
 # CACHING DEPS
-COPY  ./deps.edn ./
+COPY ./deps.edn ./
 RUN clojure -P
-RUN clojure -T:build || true
 
+# Copy build configuration and source
 COPY ./build/ /src/build/
 COPY ./src/ /src/src/
 
+# Build the uber jar
 RUN clojure -T:build uber
 
 FROM eclipse-temurin:22_36-jre-alpine as runtime
