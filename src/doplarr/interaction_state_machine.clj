@@ -113,14 +113,16 @@
                         (msg-resp "Request performed!")
                          ; Send DM notification if enabled
                         (when (:discord/dm-notifications @state/config)
-                          (a/go
-                            (let [dm-channel (->> @(m/create-dm! messaging user-id)
-                                                 (else #(fatal % "Error creating DM channel"))
-                                                 :id)]
-                              (case (:discord/requested-msg-style @state/config)
-                                :none nil
-                                :embed (m/create-message! messaging dm-channel (discord/dm-notification-embed embed))
-                                (m/create-message! messaging dm-channel (discord/dm-notification-plain payload media-type))))))
+                          (log-on-error
+                            (a/<!! (a/go
+                              (let [dm-channel (->> @(m/create-dm! messaging user-id)
+                                                   (else #(fatal % "Error creating DM channel"))
+                                                   :id)]
+                                (case (:discord/requested-msg-style @state/config)
+                                  :none nil
+                                  :embed (m/create-message! messaging dm-channel (discord/dm-notification-embed embed))
+                                  (m/create-message! messaging dm-channel (discord/dm-notification-plain payload media-type))))))
+                            "Exception sending DM notification"))
                         ; Send channel message if not DM-only
                         (when (not (:discord/dm-notifications @state/config))
                           (case (:discord/requested-msg-style @state/config)
